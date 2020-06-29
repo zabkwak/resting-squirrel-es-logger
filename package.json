@@ -1,7 +1,7 @@
 {
 	"name": "resting-squirrel-es-logger",
 	"version": "1.0.0",
-	"description": "",
+	"description": "ElasticSearch logger for Resting Squirrel apps.",
 	"main": "index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
@@ -53,5 +53,13 @@
 	"peerDependencies": {
 		"@elastic/elasticsearch": "^7.8.0",
 		"resting-squirrel": "^2.20.1"
-	}
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zabkwak/resting-squirrel-es-logger.git"
+	},
+	"bugs": {
+		"url": "https://github.com/zabkwak/resting-squirrel-es-logger/issues"
+	},
+	"homepage": "https://github.com/zabkwak/resting-squirrel-es-logger#readme"
 }

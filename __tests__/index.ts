@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as fs from 'fs';
 import * as moment from 'moment';
 import * as path from 'path';
-import rs, { Application, Error, Field, Param, Type, ParamShape } from 'resting-squirrel';
+import rs, { Application, Error, Field, Param, Type } from 'resting-squirrel';
 import RSConnector from 'resting-squirrel-connector';
 
 import logger from '../src';
