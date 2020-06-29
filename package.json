@@ -1,0 +1,57 @@
+{
+	"name": "resting-squirrel-es-logger",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"create_index": "run-script-os",
+		"create_index:win32": "echo module.exports = require('./dist'); > index.js",
+		"create_index:linux:darwin": "echo \"module.exports = require('./dist');\" > index.js",
+		"build_ts": "./node_modules/.bin/tsc && npm run create_index",
+		"clear": "run-script-os",
+		"clear:win32": "(if exist .\\dist rd /s /q .\\dist) && del /q .\\index.js 2>nul",
+		"clear:linux:darwin": "rm -rf ./dist && rm -f ./index.js",
+		"clear_docs": "run-script-os",
+		"clear_docs:win32": "if exist .\\docs rd /s /q .\\docs",
+		"clear_docs:linux:darwin": "rm -rf ./docs",
+		"create_nojekyll": "run-script-os",
+		"create_nojekyll:win32": "type nul > ./docs/.nojekyll",
+		"create_nojekyll:linux:darwin": "touch ./docs/.nojekyll",
+		"docs_generate": "./node_modules/.bin/typedoc --out docs ./src",
+		"docs": "npm run clear_docs && npm run docs_generate && npm run create_nojekyll",
+		"test": "./node_modules/.bin/mocha -r ts-node/register __tests__/**/*.ts",
+		"start": "npm run clear && npm run build_ts && node -r source-map-support/register index.js",
+		"prepublish": "npm run clear && npm run build_ts",
+		"postpublish": "npm run clear"
+	},
+	"author": "Lukas Macuda <lukas.macuda@gmail.com>",
+	"license": "MIT",
+	"engines": {
+		"node": ">=8"
+	},
+	"dependencies": {
+		"moment": "^2.27.0"
+	},
+	"devDependencies": {
+		"@elastic/elasticsearch": "^7.8.0",
+		"@types/chai": "^4.2.9",
+		"@types/core-js": "^2.5.3",
+		"@types/mocha": "^5.2.7",
+		"@types/node": "^10.17.16",
+		"chai": "^4.2.0",
+		"mocha": "^6.2.0",
+		"resting-squirrel": "^2.20.1",
+		"resting-squirrel-connector": "^2.1.0",
+		"run-script-os-fix": "^1.0.4",
+		"source-map-support": "^0.5.13",
+		"ts-node": "^8.3.0",
+		"tslint": "^5.20.0",
+		"typedoc": "^0.15.0",
+		"typescript": "^3.6.3"
+	},
+	"peerDependencies": {
+		"@elastic/elasticsearch": "^7.8.0",
+		"resting-squirrel": "^2.20.1"
+	}
+}
