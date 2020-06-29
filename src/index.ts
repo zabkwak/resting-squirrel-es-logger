@@ -7,15 +7,16 @@ import { getTemplate } from './utils';
 
 const pkg = JSON.parse(fs.readFileSync(path.resolve('./package.json')).toString());
 
-// TODO custom data to log
 export interface IOptions {
 	node: string;
 	template: Partial<{
 		name: string;
 		numberOfShards: number;
 		numberOfReplicas: number;
+		properties: { [key: string]: any };
 	}>;
 	indexTimeFormat: string;
+	getCustomData: (property: string, loggerData: ILoggerOptions) => any;
 	transformBody: (property: string, value: any) => any;
 	transformQuery: (property: string, value: any) => any;
 	onError: (error: any) => void;
@@ -52,6 +53,7 @@ interface ILoggerOptions {
 const DEFAULT_OPTIONS: IOptions = {
 	appName: 'RS App',
 	clearTemplate: false,
+	getCustomData: null,
 	indexTimeFormat: 'YYYY-MM-DD',
 	node: 'http://localhost:9200',
 	onError: null,
@@ -60,6 +62,7 @@ const DEFAULT_OPTIONS: IOptions = {
 		name: 'rs-es-logger',
 		numberOfReplicas: 0,
 		numberOfShards: 1,
+		properties: {},
 	},
 	transformBody: null,
 	transformQuery: null,
@@ -75,12 +78,16 @@ class Logger {
 		this._options = {
 			...DEFAULT_OPTIONS,
 			...options,
+			template: {
+				...DEFAULT_OPTIONS.template,
+				...options.template,
+			},
 		};
 		this._client = new Client({ node: this._options.node });
 	}
 
 	public async log(data: ILoggerOptions): Promise<void> {
-		const { template, indexTimeFormat, transformBody, transformQuery, onError, appName } = this._options;
+		const { template, indexTimeFormat, transformBody, transformQuery, appName, getCustomData } = this._options;
 		const { statusCode, method, path, spec, body, params, query, headers, took, response } = data;
 		const version: string = pkg.version;
 		const index = `${template.name}-${moment().format(indexTimeFormat)}`;
@@ -94,6 +101,7 @@ class Logger {
 		}
 		const b = { ...body };
 		const q = { ...query };
+		const customData: { [key: string]: any } = {};
 		if (typeof transformBody === 'function') {
 			Object.keys(b).forEach((key) => {
 				b[key] = transformBody(key, b[key]);
@@ -104,6 +112,9 @@ class Logger {
 				q[key] = transformQuery(key, q[key]);
 			});
 		}
+		Object.keys(template.properties).forEach((key) => {
+			customData[key] = typeof getCustomData === 'function' ? getCustomData(key, data) : null;
+		});
 		try {
 			await this._client.index({
 				body: {
@@ -121,6 +132,7 @@ class Logger {
 					statusCode,
 					took,
 					version,
+					...customData,
 				},
 				index,
 			});
@@ -130,7 +142,7 @@ class Logger {
 	}
 
 	public async init(): Promise<void> {
-		const { template, clearTemplate, onError, onReady } = this._options;
+		const { template, clearTemplate, onReady } = this._options;
 		try {
 			if (await this._client.indices.existsTemplate({ name: template.name })) {
 				if (!clearTemplate) {
@@ -141,7 +153,12 @@ class Logger {
 				});
 			}
 			await this._client.indices.putTemplate(
-				getTemplate(template.name, template.numberOfShards, template.numberOfReplicas),
+				getTemplate(
+					template.name,
+					template.numberOfShards,
+					template.numberOfReplicas,
+					template.properties,
+				),
 			);
 		} catch (e) {
 			this._error(e);

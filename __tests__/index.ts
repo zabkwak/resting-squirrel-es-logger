@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as fs from 'fs';
 import * as moment from 'moment';
 import * as path from 'path';
-import rs, { Application, Error, Field, Param, Type } from 'resting-squirrel';
+import rs, { Application, Error, Field, Param, Type, ParamShape } from 'resting-squirrel';
 import RSConnector from 'resting-squirrel-connector';
 
 import logger from '../src';
@@ -15,6 +15,11 @@ const DEFAULT_HEADERS = {
 	'accept-encoding': 'gzip, deflate',
 	'connection': 'close',
 	'host': 'localhost:8080',
+};
+const CUSTOM_DATA = {
+	userId: {
+		type: 'integer',
+	},
 };
 
 const config = JSON.parse(fs.readFileSync(path.resolve(__dirname, './config.json')).toString());
@@ -46,6 +51,7 @@ const validateRecord = async (
 	params: { [key: string]: any } = {},
 	error: { [key: string]: any } = null,
 	headers: { [key: string]: any } = {},
+	customData: { [key: string]: any } = {},
 ) => {
 	await wait();
 	await client.indices.refresh({ index });
@@ -72,7 +78,7 @@ const validateRecord = async (
 	const [hit] = hits.hits;
 	const { _source: record, _index } = hit;
 	expect(_index).to.be.equal(`${TEMPLATE_NAME}-${moment().format('YYYY-MM-DD')}`);
-	expect(record).to.have.all.keys([
+	const keys = [
 		'@timestamp',
 		'appName',
 		'body',
@@ -87,6 +93,17 @@ const validateRecord = async (
 		'statusCode',
 		'took',
 		'version',
+	];
+	const rest: { [key: string]: any } = {};
+	Object.keys(record).forEach((key) => {
+		if (keys.includes(key)) {
+			return;
+		}
+		rest[key] = record[key];
+	});
+	expect(record).to.have.all.keys([
+		...keys,
+		...Object.keys(CUSTOM_DATA),
 	]);
 	expect(record.appName).to.be.equal(APP_NAME);
 	expect(record.body).to.be.deep.equal(body);
@@ -107,6 +124,10 @@ const validateRecord = async (
 		expect(record.took).to.be.equal(took);
 	}
 	expect(record.version).to.be.equal(pkg.version);
+	expect(rest).to.be.deep.equal({
+		userId: null,
+		...customData,
+	});
 };
 
 describe('ES Logger', () => {
@@ -131,10 +152,19 @@ describe('ES Logger', () => {
 			logger: logger({
 				appName: APP_NAME,
 				clearTemplate: true,
+				getCustomData(property, { response }) {
+					switch (property) {
+						case 'userId':
+							return response?.data?.userId || null;
+						default:
+							return null;
+					}
+				},
 				node: config.node,
 				onReady: () => next('logger'),
 				template: {
 					name: TEMPLATE_NAME,
+					properties: CUSTOM_DATA,
 				},
 				transformQuery(property, value) {
 					switch (property) {
@@ -174,8 +204,8 @@ describe('ES Logger', () => {
 			args: [
 				new Field('id', Type.integer),
 			],
-		}, async () => {
-			return { data: true };
+		}, async ({ params }) => {
+			return { data: true, userId: params.id };
 		});
 		app.delete(0, '/user/:id', {
 			args: [
@@ -317,6 +347,9 @@ describe('ES Logger', () => {
 			{},
 			{},
 			{ id: 1 },
+			null,
+			{},
+			{ userId: 1 },
 		);
 	});
 

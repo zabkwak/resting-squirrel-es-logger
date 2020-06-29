@@ -1,4 +1,9 @@
-export const getTemplate = (templateName: string, numberOfShards: number = 1, numberOfReplicas: number = 0) => {
+export const getTemplate = (
+	templateName: string,
+	numberOfShards: number,
+	numberOfReplicas: number,
+	properties: { [key: string]: any },
+) => {
 	return {
 		body: {
 			index_patterns: [`${templateName}-*`],
@@ -61,6 +66,7 @@ export const getTemplate = (templateName: string, numberOfShards: number = 1, nu
 					'version': {
 						type: 'keyword',
 					},
+					...properties,
 				},
 			},
 			settings: {
