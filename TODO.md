@@ -1,0 +1,2 @@
+- Other ES versions
+- Access to the request in the logger (when the RS module supports it)
