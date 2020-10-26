@@ -14,6 +14,12 @@ export const getTemplate = (
 					},
 					'appName': {
 						type: 'text',
+						fields: {
+							keyword: {
+								type: 'keyword',
+								ignore_above: 256,
+							},
+						},
 					},
 					'body': {
 						enabled: false,
@@ -23,9 +29,21 @@ export const getTemplate = (
 						properties: {
 							code: {
 								type: 'text',
+								fields: {
+									keyword: {
+										type: 'keyword',
+										ignore_above: 256,
+									},
+								},
 							},
 							message: {
 								type: 'text',
+								fields: {
+									keyword: {
+										type: 'keyword',
+										ignore_above: 256,
+									},
+								},
 							},
 							payload: {
 								enabled: false,
@@ -39,6 +57,12 @@ export const getTemplate = (
 					},
 					'method': {
 						type: 'text',
+						fields: {
+							keyword: {
+								type: 'keyword',
+								ignore_above: 256,
+							},
+						},
 					},
 					'params': {
 						enabled: false,
@@ -46,6 +70,12 @@ export const getTemplate = (
 					},
 					'path': {
 						type: 'text',
+						fields: {
+							keyword: {
+								type: 'keyword',
+								ignore_above: 256,
+							},
+						},
 					},
 					'query': {
 						enabled: false,
@@ -53,9 +83,21 @@ export const getTemplate = (
 					},
 					'route': {
 						type: 'text',
+						fields: {
+							keyword: {
+								type: 'keyword',
+								ignore_above: 256,
+							},
+						},
 					},
 					'spec': {
 						type: 'text',
+						fields: {
+							keyword: {
+								type: 'keyword',
+								ignore_above: 256,
+							},
+						},
 					},
 					'statusCode': {
 						type: 'integer',
@@ -65,6 +107,12 @@ export const getTemplate = (
 					},
 					'version': {
 						type: 'text',
+						fields: {
+							keyword: {
+								type: 'keyword',
+								ignore_above: 256,
+							},
+						},
 					},
 					...properties,
 				},
