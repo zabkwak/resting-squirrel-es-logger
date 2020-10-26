@@ -13,7 +13,7 @@ export const getTemplate = (
 						type: 'date',
 					},
 					'appName': {
-						type: 'keyword',
+						type: 'text',
 					},
 					'body': {
 						enabled: false,
@@ -22,7 +22,7 @@ export const getTemplate = (
 					'error': {
 						properties: {
 							code: {
-								type: 'keyword',
+								type: 'text',
 							},
 							message: {
 								type: 'text',
@@ -38,24 +38,24 @@ export const getTemplate = (
 						type: 'object',
 					},
 					'method': {
-						type: 'keyword',
+						type: 'text',
 					},
 					'params': {
 						enabled: false,
 						type: 'object',
 					},
 					'path': {
-						type: 'keyword',
+						type: 'text',
 					},
 					'query': {
 						enabled: false,
 						type: 'object',
 					},
 					'route': {
-						type: 'keyword',
+						type: 'text',
 					},
 					'spec': {
-						type: 'keyword',
+						type: 'text',
 					},
 					'statusCode': {
 						type: 'integer',
@@ -64,7 +64,7 @@ export const getTemplate = (
 						type: 'integer',
 					},
 					'version': {
-						type: 'keyword',
+						type: 'text',
 					},
 					...properties,
 				},
