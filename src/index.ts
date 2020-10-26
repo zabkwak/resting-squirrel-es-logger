@@ -144,7 +144,7 @@ class Logger {
 	public async init(): Promise<void> {
 		const { template, clearTemplate, onReady } = this._options;
 		try {
-			if (await this._client.indices.existsTemplate({ name: template.name })) {
+			if ((await this._client.indices.existsTemplate({ name: template.name })).body) {
 				if (!clearTemplate) {
 					return;
 				}
