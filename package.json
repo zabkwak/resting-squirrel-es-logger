@@ -40,7 +40,7 @@
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^10.17.16",
 		"chai": "^4.2.0",
-		"mocha": "^6.2.0",
+		"mocha": "^10.2.0",
 		"resting-squirrel": "^2.20.1",
 		"resting-squirrel-connector": "^2.1.0",
 		"run-script-os-fix": "^1.0.4",
